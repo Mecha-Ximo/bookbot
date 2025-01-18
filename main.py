@@ -1,47 +1,54 @@
 def main():
-    with open("./books/frankenstein.txt") as f:
-        file_contents = f.read()
-        print(file_contents)
-        words_count = count_words(file_contents)
-        chars_count = count_characters(file_contents)
-        print_report(words_count, chars_count)
+    book_path = "books/frankenstein.txt"
+    text = get_book_text(book_path)
+    num_words = get_num_words(text)
+    chars_dict = get_chars_dict(text)
+    chars_sorted_list = chars_dict_to_sorted_list(chars_dict)
 
-def count_words(text):
-    return len(text.split())
-
-def count_characters(text):
-    lower_text = text.lower()
-    chars = {}
-
-    for char in lower_text:
-        if char in chars:
-            chars[char] += 1
-        else:
-            chars[char] = 1
-    return chars
-
-def print_report(words_count, characters_count):
-    chars = parse_characters(characters_count)
-    print("--- Begin report of books/frankenstein.txt ---")
-    print(f"{words_count} words found in the document")
+    print(f"--- Begin report of {book_path} ---")
+    print(f"{num_words} words found in the document")
     print()
 
-    for char in chars:
-        print(f"The '{char["name"]}' character was found {char["count"]} times")
+    for item in chars_sorted_list:
+        if not item["char"].isalpha():
+            continue
+        print(f"The '{item['char']}' character was found {item['num']} times")
+
     print("--- End report ---")
 
-def parse_characters(characters):
-    char_list = []
 
-    for char in characters:
-        char_list.append({"name": char, "count": characters[char]})
-    
-    def sort_on(dict):
-        return dict["count"]
+def get_num_words(text):
+    words = text.split()
+    return len(words)
 
-    char_list.sort(reverse=True, key=sort_on)
 
-    return char_list
+def sort_on(d):
+    return d["num"]
+
+
+def chars_dict_to_sorted_list(num_chars_dict):
+    sorted_list = []
+    for ch in num_chars_dict:
+        sorted_list.append({"char": ch, "num": num_chars_dict[ch]})
+    sorted_list.sort(reverse=True, key=sort_on)
+    return sorted_list
+
+
+def get_chars_dict(text):
+    chars = {}
+    for c in text:
+        lowered = c.lower()
+        if lowered in chars:
+            chars[lowered] += 1
+        else:
+            chars[lowered] = 1
+    return chars
+
+
+
+def get_book_text(path):
+    with open(path) as f:
+        return f.read()
 
 
 main()
